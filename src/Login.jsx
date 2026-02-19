@@ -1,39 +1,49 @@
-import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import axios from "axios";
+import { useNavigate, Link } from "react-router-dom";
 
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const navigate = useNavigate();
-  const API_URL = import.meta.env.VITE_API_URL;
 
-  const handleLogin = async () => {
-    if (!username || !password) {
-      alert("Please fill all fields");
-      return;
-    }
+  const handleLogin = async (e) => {
+    e.preventDefault();
 
     try {
-      await axios.post(`${API_URL}/login`, {
-        username,
-        password
-      });
+      const response = await fetch(
+        "https://netflix-backend-h1qm.onrender.com/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username,
+            password,
+          }),
+        }
+      );
 
-      alert("Login successful");
-      navigate("/");
+      const data = await response.json();
 
+      if (response.ok) {
+        alert("Login successful");
+        navigate("/");
+      } else {
+        alert(data.message || "Login failed");
+      }
     } catch (error) {
-      console.error(error.response?.data || error.message);
-      alert("Login failed");
+      alert("Server error");
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black text-white">
-      <div className="bg-black/80 p-10 rounded w-96">
-
+      <form
+        onSubmit={handleLogin}
+        className="bg-black/80 p-10 rounded w-96"
+      >
         <h1 className="text-3xl mb-6 font-bold">Sign In</h1>
 
         <input
@@ -47,13 +57,13 @@ function Login() {
         <input
           type="password"
           placeholder="Password"
-          className="w-full p-6 bg-gray-700 rounded mb-6"
+          className="w-full p-3 mb-6 bg-gray-700 rounded"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
 
         <button
-          onClick={handleLogin}
+          type="submit"
           className="w-full bg-red-600 py-3 rounded"
         >
           Sign In
@@ -65,8 +75,7 @@ function Login() {
             Register
           </Link>
         </p>
-
-      </div>
+      </form>
     </div>
   );
 }

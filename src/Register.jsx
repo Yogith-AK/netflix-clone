@@ -1,6 +1,5 @@
-import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import axios from "axios";
+import { useNavigate, Link } from "react-router-dom";
 
 function Register() {
   const [username, setUsername] = useState("");
@@ -10,35 +9,45 @@ function Register() {
 
   const navigate = useNavigate();
 
-  const API_URL = import.meta.env.VITE_API_URL;
-
-  const handleRegister = async () => {
-    if (!username || !email || !password || !phone) {
-      alert("Please fill all fields");
-      return;
-    }
+  const handleRegister = async (e) => {
+    e.preventDefault();
 
     try {
-      await axios.post(`${API_URL}/register`, {
-        username,
-        email,
-        password,
-        phone
-      });
+      const response = await fetch(
+        "https://netflix-backend-h1qm.onrender.com/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username,
+            email,
+            password,
+            phone,
+          }),
+        }
+      );
 
-      alert("Registration successful");
-      navigate("/login");
+      const data = await response.json();
 
+      if (response.ok) {
+        alert("Registration successful");
+        navigate("/login");
+      } else {
+        alert(data.message || "Registration failed");
+      }
     } catch (error) {
-      console.error(error.response?.data || error.message);
-      alert("Registration failed");
+      alert("Server error");
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black text-white">
-      <div className="bg-black/80 p-10 rounded w-96">
-
+      <form
+        onSubmit={handleRegister}
+        className="bg-black/80 p-10 rounded w-96"
+      >
         <h1 className="text-3xl mb-6 font-bold">Register</h1>
 
         <input
@@ -74,7 +83,7 @@ function Register() {
         />
 
         <button
-          onClick={handleRegister}
+          type="submit"
           className="w-full bg-red-600 py-3 rounded"
         >
           Register
@@ -86,8 +95,7 @@ function Register() {
             Sign In
           </Link>
         </p>
-
-      </div>
+      </form>
     </div>
   );
 }
