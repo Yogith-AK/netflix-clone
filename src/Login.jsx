@@ -5,9 +5,9 @@ import axios from "axios";
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate();
 
-  const API_URL = "https://netflix-backend-hlqm.onrender.com";
+  const navigate = useNavigate();
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const handleLogin = async () => {
     if (!username || !password) {
@@ -16,41 +16,30 @@ function Login() {
     }
 
     try {
-      const res = await axios.post(`${API_URL}/login`, {
+      await axios.post(`${API_URL}/login`, {
         username,
-        password,
+        password
       });
 
-      alert(res.data.message);
+      alert("Login successful");
       navigate("/");
+
     } catch (error) {
-      alert(error.response?.data?.message || "Login failed");
+      console.error(error.response?.data || error.message);
+      alert("Login failed");
     }
   };
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center bg-black px-4">
-      <h1 className="absolute top-6 left-10 text-red-600 text-3xl font-bold z-10">
-        NETFLIX
-      </h1>
+    <div className="min-h-screen flex items-center justify-center bg-black text-white">
+      <div className="bg-black/80 p-10 rounded w-96">
 
-      <img
-        src="https://wallpapercave.com/wp/wp4056410.jpg"
-        alt="background"
-        className="absolute inset-0 w-full h-full object-cover opacity-40"
-      />
-
-      <div className="absolute inset-0 bg-black/60"></div>
-
-      <div className="relative z-10 bg-black/80 backdrop-blur-lg p-12 rounded-md w-96 shadow-2xl">
-        <h1 className="text-white text-4xl font-bold mb-8">
-          Sign In
-        </h1>
+        <h1 className="text-3xl mb-6 font-bold">Sign In</h1>
 
         <input
           type="text"
           placeholder="Username"
-          className="w-full p-3 mb-4 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-red-600"
+          className="w-full p-3 mb-4 bg-gray-700 rounded"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
@@ -58,24 +47,25 @@ function Login() {
         <input
           type="password"
           placeholder="Password"
-          className="w-full p-3 mb-6 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-red-600"
+          className="w-full p-6 bg-gray-700 rounded mb-6"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
 
         <button
           onClick={handleLogin}
-          className="w-full bg-red-600 hover:bg-red-700 transition duration-300 text-white py-3 rounded font-semibold"
+          className="w-full bg-red-600 py-3 rounded"
         >
           Sign In
         </button>
 
-        <p className="text-gray-400 mt-6">
+        <p className="mt-4">
           New to Netflix?{" "}
-          <Link to="/register" className="text-white hover:underline">
-            Sign up now
+          <Link to="/register" className="text-red-500">
+            Register
           </Link>
         </p>
+
       </div>
     </div>
   );
