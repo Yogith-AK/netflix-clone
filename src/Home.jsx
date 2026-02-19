@@ -1,24 +1,23 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 function Home() {
   const [movies, setMovies] = useState([]);
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loggedIn = localStorage.getItem("isLoggedIn");
-
-    if (!loggedIn) {
-      navigate("/login");
-      return;
-    }
-
     const fetchMovies = async () => {
-      const res = await fetch(
-        `https://api.themoviedb.org/3/movie/popular?api_key=${import.meta.env.VITE_TMDB_KEY}`
-      );
-      const data = await res.json();
-      setMovies(data.results);
+      try {
+        const res = await fetch(
+          `https://api.themoviedb.org/3/movie/popular?api_key=${import.meta.env.VITE_TMDB_KEY}`
+        );
+
+        const data = await res.json();
+        setMovies(data.results || []);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching movies:", error);
+        setLoading(false);
+      }
     };
 
     fetchMovies();
@@ -26,19 +25,16 @@ function Home() {
 
   const heroMovie = movies[0];
 
-  return (
-    <div className="bg-black text-white min-h-screen relative">
+  if (loading) {
+    return (
+      <div className="bg-black text-white min-h-screen flex items-center justify-center">
+        Loading Movies...
+      </div>
+    );
+  }
 
-      {/* Logout Button */}
-      <button
-        onClick={() => {
-          localStorage.removeItem("isLoggedIn");
-          navigate("/login");
-        }}
-        className="absolute top-6 right-10 bg-red-600 px-4 py-2 rounded"
-      >
-        Logout
-      </button>
+  return (
+    <div className="bg-black text-white min-h-screen">
 
       {/* HERO SECTION */}
       {heroMovie && (
@@ -61,19 +57,24 @@ function Home() {
 
       {/* MOVIE ROW */}
       <div className="p-10">
-        <h2 className="text-2xl font-bold mb-4">Popular Movies</h2>
+        <h2 className="text-2xl font-bold mb-6">Popular Movies</h2>
 
-        <div className="flex space-x-4 overflow-x-scroll">
+        <div className="flex space-x-4 overflow-x-auto">
           {movies.map((movie) => (
-            <img
-              key={movie.id}
-              src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
-              alt={movie.title}
-              className="w-40 rounded hover:scale-110 transition duration-300"
-            />
+            <div key={movie.id} className="min-w-[160px]">
+              <img
+                src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
+                alt={movie.title}
+                className="rounded hover:scale-110 transition duration-300 cursor-pointer"
+              />
+              <p className="mt-2 text-sm text-center">
+                {movie.title}
+              </p>
+            </div>
           ))}
         </div>
       </div>
+
     </div>
   );
 }
