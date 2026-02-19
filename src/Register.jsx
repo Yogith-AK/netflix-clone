@@ -7,92 +7,80 @@ function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
-  const [error, setError] = useState("");
+
   const navigate = useNavigate();
+  const API_URL = "https://netflix-backend-hlqm.onrender.com";
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
-
+  const handleRegister = async () => {
     if (!username || !email || !password || !phone) {
-      setError("All fields are required");
+      alert("All fields required");
       return;
     }
 
     try {
-      setError("");
-
-      await axios.post("http://localhost:5000/register", {
+      const res = await axios.post(`${API_URL}/register`, {
         username,
         email,
         password,
         phone,
       });
 
-      navigate("/");
-    } catch (err) {
-      setError(
-        err.response?.data?.message || "Registration failed"
-      );
+      alert(res.data.message);
+      navigate("/login");
+    } catch (error) {
+      alert(error.response?.data?.message || "Registration failed");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black px-4">
-      <form
-        onSubmit={handleRegister}
-        className="bg-black/80 p-10 rounded-md w-96"
-      >
+    <div className="min-h-screen flex items-center justify-center bg-black">
+      <div className="bg-black/80 p-10 rounded-md w-96">
         <h1 className="text-white text-3xl font-bold mb-6">
-          Create Account
+          Register
         </h1>
-
-        {error && (
-          <p className="text-red-500 text-sm mb-4">{error}</p>
-        )}
 
         <input
           type="text"
           placeholder="Username"
-          className="w-full p-3 mb-4 bg-gray-700 text-white rounded focus:outline-none focus:ring-1 focus:ring-red-500"
-          value={username}
+          className="w-full p-3 mb-3 bg-gray-700 text-white rounded"
           onChange={(e) => setUsername(e.target.value)}
         />
 
         <input
           type="email"
           placeholder="Email"
-          className="w-full p-3 mb-4 bg-gray-700 text-white rounded focus:outline-none focus:ring-1 focus:ring-red-500"
-          value={email}
+          className="w-full p-3 mb-3 bg-gray-700 text-white rounded"
           onChange={(e) => setEmail(e.target.value)}
         />
 
         <input
           type="password"
           placeholder="Password"
-          className="w-full p-3 mb-4 bg-gray-700 text-white rounded focus:outline-none focus:ring-1 focus:ring-red-500"
-          value={password}
+          className="w-full p-3 mb-3 bg-gray-700 text-white rounded"
           onChange={(e) => setPassword(e.target.value)}
         />
 
         <input
           type="text"
           placeholder="Phone"
-          className="w-full p-3 mb-6 bg-gray-700 text-white rounded focus:outline-none focus:ring-1 focus:ring-red-500"
-          value={phone}
+          className="w-full p-3 mb-4 bg-gray-700 text-white rounded"
           onChange={(e) => setPhone(e.target.value)}
         />
 
-        <button className="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded font-semibold">
+        <button
+          onClick={handleRegister}
+          className="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded"
+        >
           Register
         </button>
 
-        <p className="text-gray-400 mt-6 text-sm">
+        <p className="text-gray-400 mt-4">
           Already have an account?{" "}
-          <Link to="/" className="text-white hover:underline">
-            Sign In
+          <Link to="/login" className="text-white">
+            Login
           </Link>
         </p>
-      </form>
+      </div>
     </div>
   );
 }

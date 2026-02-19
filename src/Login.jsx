@@ -5,8 +5,9 @@ import axios from "axios";
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-
   const navigate = useNavigate();
+
+  const API_URL = "https://netflix-backend-hlqm.onrender.com";
 
   const handleLogin = async () => {
     if (!username || !password) {
@@ -15,25 +16,20 @@ function Login() {
     }
 
     try {
-      await axios.post("http://localhost:5000/login", {
+      const res = await axios.post(`${API_URL}/login`, {
         username,
         password,
       });
 
-      // Persist login
-      localStorage.setItem("isLoggedIn", "true");
-
-      alert("Login successful");
+      alert(res.data.message);
       navigate("/");
     } catch (error) {
-      alert("Login failed");
-      console.error(error);
+      alert(error.response?.data?.message || "Login failed");
     }
   };
 
   return (
     <div className="min-h-screen relative flex items-center justify-center bg-black px-4">
-
       <h1 className="absolute top-6 left-10 text-red-600 text-3xl font-bold z-10">
         NETFLIX
       </h1>
@@ -47,7 +43,6 @@ function Login() {
       <div className="absolute inset-0 bg-black/60"></div>
 
       <div className="relative z-10 bg-black/80 backdrop-blur-lg p-12 rounded-md w-96 shadow-2xl">
-
         <h1 className="text-white text-4xl font-bold mb-8">
           Sign In
         </h1>
@@ -81,7 +76,6 @@ function Login() {
             Sign up now
           </Link>
         </p>
-
       </div>
     </div>
   );
